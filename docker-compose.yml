@@ -1,17 +1,16 @@
+version: '3.8'
 
 services:
-  # Web App Container
   web-app:
     build: ./web-app
     ports:
-      - "8080:8080"         # Exposes the web app on port 8080
+      - "8080:8080"
     environment:
-      MYSQL_HOST: mysql     # Environment variables to connect with MySQL
+      MYSQL_HOST: mysql
       MYSQL_USER: root
       MYSQL_PASSWORD: rootpassword
       MYSQL_DB: video_db
     volumes:
-      # - ./web-app:/app
       - video_storage:/storage
     networks:
       - video-net
@@ -21,16 +20,14 @@ services:
       storage:
         condition: service_started
 
-
-  # MySQL Container
   mysql:
     image: mysql:5.7
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: video_db
     volumes:
-      - video_mysql:/var/lib/mysql  # Changed volume name to video_mysql
-      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql   # Initialize database with SQL script
+      - video_mysql:/var/lib/mysql
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - video-net
     healthcheck:
@@ -40,11 +37,9 @@ services:
       start_period: 10s
       timeout: 5s
 
-
-  # File Storage Container
   storage:
     image: alpine
-    command: tail -f /dev/null  
+    command: tail -f /dev/null
     volumes:
       - video_storage:/storage
     networks:
@@ -54,12 +49,6 @@ networks:
   video-net:
     driver: bridge
 
-
-
 volumes:
-  # web-app:
-  video_mysql: 
+  video_mysql:
   video_storage:
-
-
-
