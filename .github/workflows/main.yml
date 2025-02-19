@@ -31,7 +31,7 @@ jobs:
 
       - name: Build and push Docker images
         run: |
-          docker-compose build
+          docker compose build
           docker tag web-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/acit3945project1:web-app-latest
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/acit3945project1:web-app-latest
           docker tag mysql:5.7 ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/acit3945project1:mysql-latest
