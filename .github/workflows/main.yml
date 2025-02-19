@@ -1,0 +1,41 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main  # Trigger the workflow on push to the main branch
+  pull_request:
+    branches:
+      - main  # Trigger the workflow on pull requests to the main branch
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest  # This runs on the latest Ubuntu runner
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3  # Check out the repository's code
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2  # Set up Docker Buildx for multi-platform builds
+
+      - name: Log in to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1  # Log into AWS ECR
+        with:
+          region: ${{ secrets.AWS_REGION }}
+
+      - name: Build and push Docker images
+        run: |
+          # Build and push each service's Docker image
+          docker-compose build
+          docker tag web-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/acit3945project1:web-app-latest
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/acit3945project1:web-app-latest
+          docker tag mysql:5.7 ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/acit3945project1:mysql-latest
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/acit3945project1:mysql-latest
+          docker tag storage:alpine ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/acit3945project1:storage-latest
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/acit3945project1:storage-latest
+
+      - name: Deploy to AWS (Optional)
+        run: |
+          # Use AWS CLI or ECS/EKS deployment scripts here to deploy the images
+          echo "Deployment steps can be added here"
